@@ -41,6 +41,8 @@ document.addEventListener("DOMContentLoaded", function () {
   karistir(emojiListesi);
   start();
 
+  restartButton.style.display = "none";
+
   restartButton.addEventListener("click", function () {
     karistir(emojiListesi);
     start();
@@ -50,6 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!gameStarted) {
       gameStarted = true;
       startButton.style.display = "none";
+      restartButton.style.display = "block";
       startTimer(); // Başlat düğmesine basıldığında zamanlayıcıyı başlat
     }
   });
