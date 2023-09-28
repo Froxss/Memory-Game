@@ -1,27 +1,28 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const gameDuration = 30;
+  const gameDuration = 45;
   let gameStarted = false;
   let timerInterval;
   let remainingTime = gameDuration;
   let matchedPairs = 0;
+  let isGameOver = false; // Yeni eklenen kontrol
 
   const emojiListesi = [
-    "💢",
-    "👽",
-    "☠",
-    "👻",
+    "🍆",
+    "🥝",
+    "🥥",
+    "🍓",
     "💩",
-    "💨",
-    "🗨",
-    "💤",
-    "💢",
-    "👽",
-    "☠",
-    "👻",
+    "🍑",
+    "🍒",
+    "🍌",
+    "🍆",
+    "🥝",
+    "🥥",
+    "🍓",
     "💩",
-    "💨",
-    "🗨",
-    "💤",
+    "🍑",
+    "🍒",
+    "🍌",
   ];
 
   function karistir(arr) {
@@ -44,6 +45,13 @@ document.addEventListener("DOMContentLoaded", function () {
   restartButton.style.display = "none";
 
   restartButton.addEventListener("click", function () {
+    if (isGameOver) {
+      // Eğer oyun bitmişse sadece restartButton tıklanabilir
+      isGameOver = false;
+      restartButton.style.pointerEvents = "auto";
+      restartButton.style.opacity = 1;
+      messageDisplay.textContent = "";
+    }
     karistir(emojiListesi);
     start();
   });
@@ -53,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
       gameStarted = true;
       startButton.style.display = "none";
       restartButton.style.display = "block";
-      startTimer(); // Başlat düğmesine basıldığında zamanlayıcıyı başlat
+      startTimer();
     }
   });
 
@@ -79,7 +87,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     divs.forEach(function (div) {
       div.addEventListener("click", function () {
-        if (!gameStarted || div.classList.contains("match")) return;
+        if (!gameStarted || div.classList.contains("match") || isGameOver)
+          return;
 
         div.classList.remove("flip");
 
@@ -115,6 +124,9 @@ document.addEventListener("DOMContentLoaded", function () {
             if (matchedPairs === divArray.length / 2) {
               clearInterval(timerInterval);
               messageDisplay.textContent = "Tebrikler! Oyunu Tamamladınız.";
+              isGameOver = true; // Oyun bittiğinde tıklanabilirliği devre dışı bırak
+              restartButton.style.pointerEvents = "none";
+              restartButton.style.opacity = 0.5;
             }
           } else {
             setTimeout(() => {
@@ -148,30 +160,13 @@ document.addEventListener("DOMContentLoaded", function () {
       if (remainingTime === 0) {
         clearInterval(timerInterval);
         messageDisplay.textContent = "Game Over! Süre Doldu.";
+        isGameOver = true; // Oyun süresi bittiğinde tıklanabilirliği devre dışı bırak
+        divs.forEach((div) => {
+          div.style.pointerEvents = "none";
+        });
       }
     }, 1000);
   }
-  // Yeniden başlatma düğmesine tıklanınca  timer'ı sıfırla ve kartları karıştırıp kapat
-  restartButton.addEventListener("click", function () {
-    clearInterval(timerInterval);
-    remainingTime = gameDuration;
-    matchedPairs = 0;
-
-    // Tüm kartları kapat
-    divArray.forEach((div) => {
-      div.classList.remove("flip", "match");
-    });
-
-    // Kartları karıştır
-    karistir(emojiListesi);
-
-    // Timer'i sıfırla
-    timerDisplay.textContent = `Kalan Süre: ${Math.floor(gameDuration / 60)}:${
-      gameDuration % 60
-    }`;
-    messageDisplay.textContent = "";
-    startTimer();
-  });
 
   match();
 });
