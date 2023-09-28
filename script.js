@@ -1,25 +1,29 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Eşleştirilecek emoji listesi
+  const gameDuration = 30;
+  let gameStarted = false;
+  let timerInterval;
+  let remainingTime = gameDuration;
+  let matchedPairs = 0;
+
   const emojiListesi = [
-    "🙈",
-    "🙉",
-    "🙊",
-    "🤡",
+    "💢",
+    "👽",
+    "☠",
+    "👻",
     "💩",
-    "💋",
-    "🙀",
-    "🤖",
-    "🙈",
-    "🙉",
-    "🙊",
-    "🤡",
+    "💨",
+    "🗨",
+    "💤",
+    "💢",
+    "👽",
+    "☠",
+    "👻",
     "💩",
-    "💋",
-    "🙀",
-    "🤖",
+    "💨",
+    "🗨",
+    "💤",
   ];
 
-  // Karıştırma fonksiyonu
   function karistir(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
       const randomIndex = Math.floor(Math.random() * (i + 1));
@@ -27,34 +31,36 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Yeniden başlatma düğmesi
   const restartButton = document.getElementById("shuffle");
-  // Oyun tahtası
+  const startButton = document.getElementById("start");
   const mainContainer = document.querySelector(".main-container");
-  // Kartların listesi
   const divArray = Array.from(mainContainer.querySelectorAll(".memory-card"));
+  const timerDisplay = document.querySelector(".timer");
+  const messageDisplay = document.querySelector(".message");
 
-  // Emoji listesini karıştır ve oyunu başlat
   karistir(emojiListesi);
   start();
 
-  // Yeniden başlatma düğmesine tıklanınca
   restartButton.addEventListener("click", function () {
-    // Emoji listesini yeniden karıştır ve oyunu başlat
     karistir(emojiListesi);
     start();
   });
 
-  // Oyunu başlatma işlevi
+  startButton.addEventListener("click", function () {
+    if (!gameStarted) {
+      gameStarted = true;
+      startButton.style.display = "none";
+      startTimer(); // Başlat düğmesine basıldığında zamanlayıcıyı başlat
+    }
+  });
+
   function start() {
     divArray.forEach((div, index) => {
-      // Kartların içeriğini emoji'lerle doldur
       div.querySelector(".front-face").textContent = emojiListesi[index];
-      // Kartı tıklanabilir hale getir
       div.classList.remove("flip", "match");
       div.style.cursor = "pointer";
     });
-    // Kartları ters çevir (arka yüz göster)
+
     setTimeout(() => {
       divArray.forEach((div) => {
         div.classList.add("flip");
@@ -62,11 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 300);
   }
 
-  let matchControl = false;
-
-  // Kartların eşleşme kontrolü
   function match() {
-    // Tüm kartları seç
     const divs = document.querySelectorAll(".memory-card");
     let divText1 = null;
     let divText2 = null;
@@ -74,10 +76,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     divs.forEach(function (div) {
       div.addEventListener("click", function () {
-        // İlk tıklama veya eşleşen kartlar tıklanamaz hale geldiyse işlem yapma
-        if (!firstClick || div.classList.contains("match")) return;
+        if (!gameStarted || div.classList.contains("match")) return;
 
-        // Kartı aç (flip animasyonu)
         div.classList.remove("flip");
 
         if (!divText1) {
@@ -87,11 +87,8 @@ document.addEventListener("DOMContentLoaded", function () {
           firstClick = false;
 
           if (divText1 === divText2) {
-            console.log("Eşleşme Başarılı");
-            // Eşleşme durumunda kartları işaretle
             div.classList.add("match");
 
-            // Kartı ölçeklendirme animasyonunu başlat
             div.style.transform = "scale(1.1)";
             setTimeout(() => {
               div.style.transform = "scale(1)";
@@ -103,16 +100,20 @@ document.addEventListener("DOMContentLoaded", function () {
               ) {
                 otherDiv.classList.add("match");
 
-                // Diğer eşleşen kartları da ölçeklendirme animasyonu ile tamamla
                 otherDiv.style.transform = "scale(1.1)";
                 setTimeout(() => {
                   otherDiv.style.transform = "scale(1)";
                 }, 500);
               }
             });
+
+            matchedPairs++;
+
+            if (matchedPairs === divArray.length / 2) {
+              clearInterval(timerInterval);
+              messageDisplay.textContent = "Tebrikler! Oyunu Tamamladınız.";
+            }
           } else {
-            console.log("Eşleşme Başarısız");
-            // Eşleşmeyen kartları kapat (arka yüzü göster)
             setTimeout(() => {
               divs.forEach((otherDiv) => {
                 if (!otherDiv.classList.contains("match")) {
@@ -122,7 +123,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }, 500);
           }
 
-          // İkinci kart tıklama sonrası işlemi sıfırla
           divText1 = null;
           divText2 = null;
           firstClick = true;
@@ -131,6 +131,44 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Oyunu başlat
+  function startTimer() {
+    timerInterval = setInterval(function () {
+      remainingTime--;
+
+      const minutes = Math.floor(remainingTime / 60);
+      const seconds = remainingTime % 60;
+
+      timerDisplay.textContent = `Kalan Süre: ${minutes}:${
+        seconds < 10 ? "0" : ""
+      }${seconds}`;
+
+      if (remainingTime === 0) {
+        clearInterval(timerInterval);
+        messageDisplay.textContent = "Game Over! Süre Doldu.";
+      }
+    }, 1000);
+  }
+  // Yeniden başlatma düğmesine tıklanınca  timer'ı sıfırla ve kartları karıştırıp kapat
+  restartButton.addEventListener("click", function () {
+    clearInterval(timerInterval);
+    remainingTime = gameDuration;
+    matchedPairs = 0;
+
+    // Tüm kartları kapat
+    divArray.forEach((div) => {
+      div.classList.remove("flip", "match");
+    });
+
+    // Kartları karıştır
+    karistir(emojiListesi);
+
+    // Timer'i sıfırla
+    timerDisplay.textContent = `Kalan Süre: ${Math.floor(gameDuration / 60)}:${
+      gameDuration % 60
+    }`;
+    messageDisplay.textContent = "";
+    startTimer();
+  });
+
   match();
 });

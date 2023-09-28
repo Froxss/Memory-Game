@@ -5,90 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
     <title>Memory Game</title>
-    <style>
-      body {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        background-color: #f0f0f0;
-      }
-
-      .main-container {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        grid-gap: 10px;
-        background-color: #929292;
-        padding: 10px;
-      }
-
-      .memory-card {
-        width: 100px;
-        height: 100px;
-        background-color: #ccc; /* Kartların başlangıç rengi (gri) */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 50px;
-        cursor: pointer;
-        perspective: 1000px;
-        transition: transform 0.2s;
-        transform-style: preserve-3d;
-        border-radius: 5px;
-      }
-
-      .memory-card.flip {
-        transform: rotateY(180deg);
-        transform: rotateY(180deg);
-      }
-
-      .memory-card .front-face,
-      .memory-card .back-face {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        backface-visibility: hidden;
-        border-radius: 5px;
-      }
-
-      .memory-card .back-face {
-        transform: rotateY(180deg);
-        background-color: #ccc;
-      }
-
-      button {
-        margin-top: 30px;
-      }
-      .memory-card.match {
-        pointer-events: none;
-      }
-      @keyframes shake {
-        0% {
-          transform: translateX(0);
-        }
-        25% {
-          transform: translateX(-5px);
-        }
-        50% {
-          transform: translateX(5px);
-        }
-        75% {
-          transform: translateX(-5px);
-        }
-        100% {
-          transform: translateX(5px);
-        }
-      }
-
-      .shake {
-        animation: shake 0.3s ease-in-out;
-      }
-    </style>
+    <style></style>
   </head>
   <body>
     <div class="main-container">
@@ -121,7 +38,7 @@
         <div class="back-face"></div>
       </div>
       <div class="memory-card">
-        <div class="front-face"></div>
+        <div class="front-face">🙈</div>
         <div class="back-face"></div>
       </div>
       <div class="memory-card">
@@ -157,9 +74,10 @@
         <div class="back-face"></div>
       </div>
     </div>
-    <div>
-      <button id="shuffle" class="restart">Restart Game</button>
-    </div>
+    <button id="start" class="restart">Başlat</button>
+    <button id="shuffle" class="restart">Yeniden Başlat</button>
+    <div class="timer">Kalan Süre: 0:30</div>
+    <div class="message"></div>
 
     <script src="script.js"></script>
   </body>
